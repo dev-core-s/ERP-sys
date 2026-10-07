@@ -1,22 +1,15 @@
 import { Hono } from 'hono'
-import { serveStatic } from '@hono/node-server/serve-static'
+import { handle } from 'hono/vercel'
 
-const app = new Hono()
+export const config = {
+  runtime: 'nodejs' // or 'edge'
+}
 
-const welcomeStrings = [
-  'Hello Hono!',
-  'To learn more about Hono on Vercel, visit https://vercel.com/docs/frameworks/backend/hono'
-]
+const app = new Hono().basePath('/api')
 
-// API routes
-app.get('/api', (c) => {
-  return c.text(welcomeStrings.join('\n\n'))
+app.get('/hello', (c) => {
+  return c.json({ message: 'Hello from Hono API!' })
 })
 
-// 1. Serve static files (JS, CSS, images, etc.) from the dist directory
-app.use('/*', serveStatic({ root: './frontend/dist' }))
-
-// 2. Catch-all fallback to index.html for React Router
-app.get('*', serveStatic({ path: './frontend/dist/index.html' }))
-
-export default app
+// Export the Vercel handler
+export default handle(app)
